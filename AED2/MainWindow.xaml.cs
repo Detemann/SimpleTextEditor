@@ -30,6 +30,7 @@ namespace AED2
         public MainWindow()
         {
             InitializeComponent();
+            loadHashTable();
         }
 
         private void openFileBtn_Click(object sender, RoutedEventArgs e)
@@ -68,7 +69,7 @@ namespace AED2
                 var fileDialog = new SaveFileDialog();
                 fileDialog.InitialDirectory = sampleOpenFolder;
                 fileDialog.DefaultExt = "txt";
-                fileDialog.Filter = "Arquivos de texto (*.txt)|*.txt"; // Corrigido o filtro
+                fileDialog.Filter = "Arquivos de texto (*.txt)|*.txt";
                 var result = fileDialog.ShowDialog();
 
                 fileDialogName = fileDialog.FileName;
@@ -84,6 +85,38 @@ namespace AED2
                 var caretIndex = fileSpaceBox.CaretIndex;
                 fileSpaceBox.Text = fileSpaceBox.Text.Insert(caretIndex, "\n");
                 fileSpaceBox.CaretIndex = caretIndex + 1;
+            }
+        }
+
+        private void loadHashTable()
+        {
+            string filePath = "C:\\Users\\Detemann\\source\\repos\\AED2\\AED2\\Palvras em Portugues.txt";
+            Dictionary<int, string> table = new Dictionary<int, string>();
+            try
+            {
+                // Abre o arquivo para leitura
+                using (StreamReader sr = new StreamReader(filePath))
+                {
+                    string line;
+                    int lineNumber = 0;
+                    // Lê o arquivo linha por linha
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        lineNumber++;
+                        string word = line.Trim();
+
+                        // Adiciona a linha número e a palavra ao dicionário
+                        table.Add(lineNumber, word);
+                    }
+                }
+
+                // Verifica se todos os elementos foram adicionados
+                Console.WriteLine("Total de elementos no dicionário: " + table.Count);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Ocorreu um erro ao ler o arquivo:");
+                Console.WriteLine(e.Message);
             }
         }
 
