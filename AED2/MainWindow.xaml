@@ -9,7 +9,13 @@
     <Grid>
         <Button Name="openFileBtn" Click="openFileBtn_Click" Content="Abrir Arquivo de Texto" HorizontalAlignment="Left" Height="45" Margin="39,84,0,0" VerticalAlignment="Top" Width="151"/>
         <Button Name="saveFileBtn" Click="saveFileBtn_Click" Content="Salvar Arquivo de Texto" HorizontalAlignment="Left" Height="45" Margin="39,158,0,0" VerticalAlignment="Top" Width="151"/>
-        <TextBox Name="fileSpaceBox" BorderBrush="Black" BorderThickness="1" VerticalScrollBarVisibility="Auto" FontSize="14" KeyDown="fileSpaceBox_KeyDown" HorizontalAlignment="Left" Height="556" Margin="225,84,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="885"/>
+        <RichTextBox Name="fileSpaceBox" BorderBrush="Black" BorderThickness="1" VerticalScrollBarVisibility="Auto" FontFamily="Consolas" FontSize="14" AcceptsReturn="True" AcceptsTab="True" SpellCheck.IsEnabled="False" HorizontalAlignment="Left" Height="556" Margin="225,84,0,0" VerticalAlignment="Top" Width="885">
+            <RichTextBox.Resources>
+                <Style TargetType="Paragraph">
+                    <Setter Property="Margin" Value="0"/>
+                </Style>
+            </RichTextBox.Resources>
+        </RichTextBox>
         <TextBlock x:Name="fileNameBlock" Background="LightGray" FontSize="14" ScrollViewer.HorizontalScrollBarVisibility="Auto"  HorizontalAlignment="Left" Height="29" Margin="225,50,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="885"/>
         <TextBlock HorizontalAlignment="Left" Height="17" Margin="617,28,0,0" TextWrapping="Wrap" Text="Nome do Arquivo:" VerticalAlignment="Top" Width="101"/>
 

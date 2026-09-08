@@ -27,10 +27,13 @@ namespace AED2
         public string fileDialogName = "";
         public string[] readtext = new string[1000];
 
+        private SpellCheckHighlighter highlighter;
+
         public MainWindow()
         {
             InitializeComponent();
-            loadHashTable();
+            loadDictionary();
+            highlighter = new SpellCheckHighlighter(fileSpaceBox);
         }
 
         private void openFileBtn_Click(object sender, RoutedEventArgs e)
@@ -43,28 +46,22 @@ namespace AED2
             fileDialog.ShowDialog();
             fileDialogName = fileDialog.FileName;
 
-            if(fileDialogName != "")
+            if (fileDialogName != "")
             {
-                fileNameBlock.Text = "";
-                fileSpaceBox.Text = "";
                 fileNameBlock.Text = fileDialogName;
                 readtext = File.ReadAllLines(fileDialogName);
 
-                for(int i = 0; i < readtext.Length; i++)
-                {
-                    fileSpaceBox.Text += readtext[i] + '\n';
-                }
-
+                highlighter.SetText(string.Join("\n", readtext));
             }
-            
         }
 
         private void saveFileBtn_Click(object sender, RoutedEventArgs e)
         {
-            if(fileDialogName != "")
+            if (fileDialogName != "")
             {
-                File.WriteAllText(fileDialogName, fileSpaceBox.Text);
-            } else
+                File.WriteAllText(fileDialogName, highlighter.GetText());
+            }
+            else
             {
                 var fileDialog = new SaveFileDialog();
                 fileDialog.InitialDirectory = sampleOpenFolder;
@@ -73,45 +70,18 @@ namespace AED2
                 var result = fileDialog.ShowDialog();
 
                 fileDialogName = fileDialog.FileName;
-                File.WriteAllText(fileDialogName, fileSpaceBox.Text);
-        
+                File.WriteAllText(fileDialogName, highlighter.GetText());
             }
         }
 
-        private void fileSpaceBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        private void loadDictionary()
         {
-            if (e.Key == Key.Enter)
-            {
-                var caretIndex = fileSpaceBox.CaretIndex;
-                fileSpaceBox.Text = fileSpaceBox.Text.Insert(caretIndex, "\n");
-                fileSpaceBox.CaretIndex = caretIndex + 1;
-            }
-        }
+            string filePath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Palvras em Portugues.txt");
 
-        private void loadHashTable()
-        {
-            string filePath = "C:\\Users\\Detemann\\source\\repos\\AED2\\AED2\\Palvras em Portugues.txt";
-            Dictionary<int, string> table = new Dictionary<int, string>();
             try
             {
-                // Abre o arquivo para leitura
-                using (StreamReader sr = new StreamReader(filePath))
-                {
-                    string line;
-                    int lineNumber = 0;
-                    // Lê o arquivo linha por linha
-                    while ((line = sr.ReadLine()) != null)
-                    {
-                        lineNumber++;
-                        string word = line.Trim();
-
-                        // Adiciona a linha número e a palavra ao dicionário
-                        table.Add(lineNumber, word);
-                    }
-                }
-
-                // Verifica se todos os elementos foram adicionados
-                Console.WriteLine("Total de elementos no dicionário: " + table.Count);
+                int total = AutocorrectEngine.LoadDictionary(filePath);
+                Console.WriteLine("Total de palavras no dicionário: " + total);
             }
             catch (Exception e)
             {
@@ -119,6 +89,5 @@ namespace AED2
                 Console.WriteLine(e.Message);
             }
         }
-
     }
 }
