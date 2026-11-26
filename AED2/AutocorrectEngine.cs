@@ -20,6 +20,11 @@ namespace AED2
 
         private static readonly CultureInfo Culture = CultureInfo.GetCultureInfo("pt-BR");
 
+        private static readonly Encoding Utf8NoBom = new UTF8Encoding(false);
+
+        // Arquivo onde ficam as palavras que o usuário adicionou pelo menu de sugestões.
+        private static string userDictionaryPath;
+
         public static int Count { get { return Words.Count; } }
 
         public static bool IsLoaded { get { return Words.Count > 0; } }
@@ -40,6 +45,49 @@ namespace AED2
             }
 
             return Words.Count;
+        }
+
+        /// <summary>
+        /// Carrega as palavras adicionadas pelo usuário em sessões anteriores e passa a
+        /// gravar nesse arquivo as próximas. Deve ser chamado depois de LoadDictionary,
+        /// que limpa as palavras carregadas. Retorna quantas palavras novas foram lidas.
+        /// </summary>
+        public static int LoadUserDictionary(string filePath)
+        {
+            userDictionaryPath = filePath;
+            if (!File.Exists(filePath)) return 0;
+
+            int before = Words.Count;
+            foreach (string line in File.ReadAllLines(filePath, Encoding.UTF8))
+            {
+                Add(line);
+            }
+
+            return Words.Count - before;
+        }
+
+        /// <summary>
+        /// Adiciona uma palavra ao dicionário e a grava no arquivo do usuário,
+        /// para que ela continue reconhecida quando o programa for aberto de novo.
+        /// </summary>
+        public static void AddUserWord(string word)
+        {
+            if (string.IsNullOrWhiteSpace(word) || IsKnown(word)) return;
+
+            Add(word);
+
+            if (userDictionaryPath == null) return;
+
+            try
+            {
+                File.AppendAllText(userDictionaryPath, Normalize(word) + Environment.NewLine, Utf8NoBom);
+            }
+            catch (Exception e)
+            {
+                // Sem permissão de escrita, por exemplo: a palavra continua valendo nesta sessão.
+                Console.WriteLine("Não foi possível salvar a palavra no dicionário do usuário:");
+                Console.WriteLine(e.Message);
+            }
         }
 
         public static void Add(string word)

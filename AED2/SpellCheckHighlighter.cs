@@ -333,7 +333,7 @@ namespace AED2
             add.Header = "Adicionar ao dicionário";
             add.Click += delegate
             {
-                AutocorrectEngine.Add(word);
+                AutocorrectEngine.AddUserWord(word);
                 markCache.Remove(word);
                 Unmark(range);
             };

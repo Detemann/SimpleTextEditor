@@ -82,6 +82,10 @@ namespace AED2
             {
                 int total = AutocorrectEngine.LoadDictionary(filePath);
                 Console.WriteLine("Total de palavras no dicionário: " + total);
+
+                string userFilePath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "palavras-adicionadas.txt");
+                int added = AutocorrectEngine.LoadUserDictionary(userFilePath);
+                Console.WriteLine("Palavras adicionadas pelo usuário: " + added);
             }
             catch (Exception e)
             {
