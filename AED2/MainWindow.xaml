@@ -5,19 +5,177 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AED2"
         mc:Ignorable="d"
-        Title="Editor Texto" Height="700" Width="1150">
+        Title="Editor de Texto"
+        Height="700" Width="1150" MinHeight="420" MinWidth="720"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource AppBackground}"
+        FontFamily="Segoe UI"
+        Foreground="{StaticResource TextPrimary}"
+        UseLayoutRounding="True">
     <Grid>
-        <Button Name="openFileBtn" Click="openFileBtn_Click" Content="Abrir Arquivo de Texto" HorizontalAlignment="Left" Height="45" Margin="39,84,0,0" VerticalAlignment="Top" Width="151"/>
-        <Button Name="saveFileBtn" Click="saveFileBtn_Click" Content="Salvar Arquivo de Texto" HorizontalAlignment="Left" Height="45" Margin="39,158,0,0" VerticalAlignment="Top" Width="151"/>
-        <RichTextBox Name="fileSpaceBox" BorderBrush="Black" BorderThickness="1" VerticalScrollBarVisibility="Auto" FontFamily="Consolas" FontSize="14" AcceptsReturn="True" AcceptsTab="True" SpellCheck.IsEnabled="False" HorizontalAlignment="Left" Height="556" Margin="225,84,0,0" VerticalAlignment="Top" Width="885">
-            <RichTextBox.Resources>
-                <Style TargetType="Paragraph">
-                    <Setter Property="Margin" Value="0"/>
-                </Style>
-            </RichTextBox.Resources>
-        </RichTextBox>
-        <TextBlock x:Name="fileNameBlock" Background="LightGray" FontSize="14" ScrollViewer.HorizontalScrollBarVisibility="Auto"  HorizontalAlignment="Left" Height="29" Margin="225,50,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="885"/>
-        <TextBlock HorizontalAlignment="Left" Height="17" Margin="617,28,0,0" TextWrapping="Wrap" Text="Nome do Arquivo:" VerticalAlignment="Top" Width="101"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
 
+        <!-- Cabeçalho: nome do app e ações -->
+        <Border Grid.Row="0" Background="{StaticResource Surface}"
+                BorderBrush="{StaticResource BorderSubtle}" BorderThickness="0,0,0,1"
+                Padding="24,14">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Width="38" Height="38" CornerRadius="9" Background="{StaticResource Accent}">
+                        <TextBlock Text="&#xE70F;" FontFamily="{StaticResource IconFont}" FontSize="18"
+                                   Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="Editor de Texto" FontSize="17" FontWeight="SemiBold"/>
+                        <TextBlock Text="Corretor ortográfico em português" FontSize="12"
+                                   Foreground="{StaticResource TextSecondary}"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Name="openFileBtn" Click="openFileBtn_Click"
+                            Style="{StaticResource ToolbarButton}"
+                            ToolTip="Abrir um arquivo .txt do computador">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE8E5;" Style="{StaticResource ButtonIcon}"/>
+                            <TextBlock Text="Abrir arquivo" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Name="saveFileBtn" Click="saveFileBtn_Click"
+                            Style="{StaticResource PrimaryButton}" Margin="10,0,0,0"
+                            ToolTip="Salvar o texto no arquivo atual">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE74E;" Style="{StaticResource ButtonIcon}"/>
+                            <TextBlock Text="Salvar arquivo" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Área do documento -->
+        <Grid Grid.Row="1" Margin="24,20,24,16">
+            <!-- Sombra num elemento separado, para não deixar o texto do editor embaçado -->
+            <Border CornerRadius="10" Background="{StaticResource Surface}">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="18" ShadowDepth="2" Direction="270" Opacity="0.08"/>
+                </Border.Effect>
+            </Border>
+
+            <Border CornerRadius="10" Background="{StaticResource Surface}"
+                    BorderBrush="{StaticResource BorderSubtle}" BorderThickness="1">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Barra com o nome do arquivo -->
+                    <Border Grid.Row="0" Background="{StaticResource SurfaceMuted}"
+                            BorderBrush="{StaticResource BorderSubtle}" BorderThickness="0,0,0,1"
+                            CornerRadius="10,10,0,0" Padding="18,10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Text="&#xE8A5;" FontFamily="{StaticResource IconFont}" FontSize="14"
+                                       Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="Nome do Arquivo:" Margin="8,0,8,0"
+                                       FontSize="12" FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center"/>
+
+                            <Grid Grid.Column="2" VerticalAlignment="Center">
+                                <TextBlock x:Name="fileNameBlock" Text="" FontSize="13"
+                                           TextTrimming="CharacterEllipsis">
+                                    <!-- Caminho completo no tooltip, útil quando ele é cortado com "…" -->
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="ToolTip" Value="{Binding Text, RelativeSource={RelativeSource Self}}"/>
+                                            <Style.Triggers>
+                                                <Trigger Property="Text" Value="">
+                                                    <Setter Property="ToolTip" Value="{x:Null}"/>
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                                <!-- Aparece só enquanto nenhum arquivo foi aberto -->
+                                <TextBlock Text="Nenhum arquivo aberto" FontSize="13" FontStyle="Italic"
+                                           Foreground="{StaticResource TextDisabled}" IsHitTestVisible="False">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Text, ElementName=fileNameBlock}" Value="">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Grid>
+                        </Grid>
+                    </Border>
+
+                    <!-- Editor -->
+                    <RichTextBox Name="fileSpaceBox" Grid.Row="1"
+                                 Background="Transparent" BorderThickness="0"
+                                 Padding="18,14" FocusVisualStyle="{x:Null}"
+                                 Foreground="{StaticResource TextPrimary}"
+                                 VerticalScrollBarVisibility="Auto"
+                                 FontFamily="Consolas" FontSize="14"
+                                 AcceptsReturn="True" AcceptsTab="True"
+                                 SpellCheck.IsEnabled="False">
+                        <RichTextBox.Resources>
+                            <Style TargetType="Paragraph">
+                                <Setter Property="Margin" Value="0"/>
+                            </Style>
+                        </RichTextBox.Resources>
+                    </RichTextBox>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- Rodapé com a legenda do corretor -->
+        <Border Grid.Row="2" Background="{StaticResource Surface}"
+                BorderBrush="{StaticResource BorderSubtle}" BorderThickness="0,1,0,0"
+                Padding="24,8">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Background="{StaticResource MarkBackground}" CornerRadius="3" Padding="6,1">
+                        <TextBlock Text="palavra" FontFamily="Consolas" FontSize="12"
+                                   Foreground="{StaticResource MarkForeground}"/>
+                    </Border>
+                    <TextBlock Margin="8,0,0,0" FontSize="12" VerticalAlignment="Center"
+                               Foreground="{StaticResource TextSecondary}"
+                               Text="Palavra não reconhecida — clique nela para ver sugestões"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="&#xE73E;" FontFamily="{StaticResource IconFont}" FontSize="12"
+                               Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center"/>
+                    <TextBlock Margin="6,0,0,0" FontSize="12" VerticalAlignment="Center"
+                               Foreground="{StaticResource TextSecondary}"
+                               Text="Acentos corrigidos automaticamente  ·  Português (BR)"/>
+                </StackPanel>
+            </Grid>
+        </Border>
     </Grid>
 </Window>
